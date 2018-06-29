@@ -61,14 +61,26 @@ double NaN() {
   return std::numeric_limits<double>::quiet_NaN();
 }
 
-ExplicitlyConstructed< ::std::string> fixed_address_empty_string;
-GOOGLE_PROTOBUF_DECLARE_ONCE(empty_string_once_init_);
+ExplicitlyConstructed< ::std::string>& fixed_address_empty_string() {
+    static ExplicitlyConstructed< ::std::string> s;
+    return s;
+};
 
-void DeleteEmptyString() { fixed_address_empty_string.Destruct(); }
+void DeleteEmptyString() { fixed_address_empty_string().Destruct(); }
 
 void InitEmptyString() {
-  fixed_address_empty_string.DefaultConstruct();
+  fixed_address_empty_string().DefaultConstruct();
   OnShutdown(&DeleteEmptyString);
+}
+
+const ::std::string& GetEmptyStringAlreadyInited() {
+  return fixed_address_empty_string().get();
+}
+
+const ::std::string& GetEmptyString() {
+  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
+  ::google::protobuf::GoogleOnceInit(&once, &InitEmptyString);
+  return GetEmptyStringAlreadyInited();
 }
 
 size_t StringSpaceUsedExcludingSelfLong(const string& str) {

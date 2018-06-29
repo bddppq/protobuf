@@ -472,7 +472,6 @@ typedef std::map<DescriptorIntPair, const FieldDescriptor*>
 typedef hash_map<string, const SourceCodeInfo_Location*> LocationsByPathMap;
 
 std::set<string>* allowed_proto3_extendees_ = NULL;
-GOOGLE_PROTOBUF_DECLARE_ONCE(allowed_proto3_extendees_init_);
 
 void DeleteAllowedProto3Extendee() {
   delete allowed_proto3_extendees_;
@@ -502,7 +501,8 @@ void InitAllowedProto3Extendee() {
 // instead of comparing the descriptor directly because the extensions may be
 // defined in a different pool.
 bool AllowedExtendeeInProto3(const string& name) {
-  ::google::protobuf::GoogleOnceInit(&allowed_proto3_extendees_init_, &InitAllowedProto3Extendee);
+  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
+  ::google::protobuf::GoogleOnceInit(&once, &InitAllowedProto3Extendee);
   return allowed_proto3_extendees_->find(name) !=
          allowed_proto3_extendees_->end();
 }
@@ -825,7 +825,6 @@ FileDescriptorTables::~FileDescriptorTables() {}
 namespace {
 
 FileDescriptorTables* file_descriptor_tables_ = NULL;
-GOOGLE_PROTOBUF_DECLARE_ONCE(file_descriptor_tables_once_init_);
 
 void DeleteFileDescriptorTables() {
   delete file_descriptor_tables_;
@@ -837,9 +836,10 @@ void InitFileDescriptorTables() {
   internal::OnShutdown(&DeleteFileDescriptorTables);
 }
 
-inline void InitFileDescriptorTablesOnce() {
+void InitFileDescriptorTablesOnce() {
+  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
   ::google::protobuf::GoogleOnceInit(
-      &file_descriptor_tables_once_init_, &InitFileDescriptorTables);
+      &once, &InitFileDescriptorTables);
 }
 
 }  // anonymous namespace
@@ -1331,7 +1331,6 @@ namespace {
 
 EncodedDescriptorDatabase* generated_database_ = NULL;
 DescriptorPool* generated_pool_ = NULL;
-GOOGLE_PROTOBUF_DECLARE_ONCE(generated_pool_init_);
 
 void DeleteGeneratedPool() {
   delete generated_database_;
@@ -1348,8 +1347,9 @@ static void InitGeneratedPool() {
   internal::OnShutdown(&DeleteGeneratedPool);
 }
 
-inline void InitGeneratedPoolOnce() {
-  ::google::protobuf::GoogleOnceInit(&generated_pool_init_, &InitGeneratedPool);
+void InitGeneratedPoolOnce() {
+  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
+  ::google::protobuf::GoogleOnceInit(&once, &InitGeneratedPool);
 }
 
 }  // anonymous namespace

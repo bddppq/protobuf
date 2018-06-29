@@ -2064,7 +2064,7 @@ size_t MessageGenerator::GenerateParseAuxTable(io::Printer* printer) {
           case FieldOptions::STRING:
             vars["default"] =
                 field->default_value_string().empty()
-                    ? "&::google::protobuf::internal::fixed_address_empty_string"
+                    ? "&::google::protobuf::internal::fixed_address_empty_string()"
                     : "&" + Namespace(field) + " ::" + classname_ +
                           "::_default_" + FieldName(field) + "_";
             break;
